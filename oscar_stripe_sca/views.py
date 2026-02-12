@@ -65,6 +65,8 @@ class StripeSCASuccessResponseView(CorePaymentDetailsView):
 
     def get_context_data(self, **kwargs):
         ctx = super(StripeSCASuccessResponseView, self).get_context_data(**kwargs)
+        if ctx["order_total"] is None:
+            ctx.update(self.build_submission(basket=ctx["basket"]))
         if ctx['order_total'] is None:
             messages.error(self.request, "Your checkout session has expired, please try again")
             raise PermissionDenied
