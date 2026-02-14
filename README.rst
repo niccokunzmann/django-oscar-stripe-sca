@@ -33,6 +33,12 @@ Settings are described in the settings.py file:
  - STRIPE_PAYMENT_SUCCESS_URL: The URL to which Stripe should redirect upon payment success.
  - STRIPE_PAYMENT_CANCEL_URL: The URL to which Stripe should redirect upon payment cancel.
 
+Session
+-------
+
+The browser can forget the session when handing over to Stripe.
+Make sure to [configure your session](https://docs.djangoproject.com/en/5.2/topics/http/sessions/). E.g. `cookie-based`
+
 Views
 =====
 Three urls are provided in apps.py. Three views are provided in the views.py file. 
