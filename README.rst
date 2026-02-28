@@ -87,6 +87,73 @@ Run the migrations and start the server:
     >python manage.py migrate
     >python manage.py runserver
 
+Testing without a Stripe account
+=================================
+
+``oscar_stripe_sca.testing`` provides drop-in mock views so that your
+integration and feature tests never make real Stripe API calls.
+
+Wiring in the mock config
+--------------------------
+
+Replace the real app config with the mock one in your test settings:
+
+.. code-block:: python
+
+    INSTALLED_APPS[
+        INSTALLED_APPS.index("oscar_stripe_sca.apps.StripeSCACheckoutConfig")
+    ] = "oscar_stripe_sca.apps.MockStripeSCACheckoutConfig"
+
+This must happen before Django's app registry is initialised (i.e. in your settings module).
+
+Controlling accept / cancel per test
+--------------------------------------
+
+The mock payment view reads ``settings.STRIPE_TESTING_OUTCOME`` on every
+request, so you can flip it between test cases without restarting Django.
+
+Add a default in your test settings:
+
+.. code-block:: python
+
+    STRIPE_TESTING_OUTCOME = "accept"  # or "cancel"
+
+**pytest** — use the ``settings`` fixture from ``pytest-django``:
+
+.. code-block:: python
+
+    import pytest
+
+    @pytest.mark.django_db
+    def test_cancel(client, settings):
+        settings.STRIPE_TESTING_OUTCOME = "cancel"
+        # … drive checkout via the test client …
+
+**behave** — override per scenario using tags in ``environment.py``:
+
+.. code-block:: python
+
+    # features/environment.py
+    from django.conf import settings
+
+    def before_scenario(context, scenario):
+        settings.STRIPE_TESTING_OUTCOME = (
+            "cancel" if "payment_cancel" in scenario.tags else "accept"
+        )
+
+Example behave feature test
+-----------------------------
+
+.. code-block:: gherkin
+
+    Scenario: A logged-in user completes a purchase.
+      ...
+       Then I see "Your order has been placed"
+    @payment_cancel
+    Scenario: A logged-in user cancels payment.
+      ...
+       Then I see "Stripe transaction cancelled"
+
 TODO
 ====
  - The tests have not been updated yet.
