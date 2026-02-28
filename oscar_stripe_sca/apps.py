@@ -24,7 +24,7 @@ class StripeSCACheckoutConfig(CheckoutConfig):
     
 
 class MockStripeSCACheckoutConfig(StripeSCACheckoutConfig):
-    """Checkout app config that wires in mock Stripe views for feature tests."""
+    """Checkout app config that wires in mock Stripe views for tests."""
 
     def ready(self):
         super().ready()

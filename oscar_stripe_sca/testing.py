@@ -1,20 +1,9 @@
 """Mock Stripe views for feature tests.
 
-Wire these in by swapping the app config in your test settings:
-
-    INSTALLED_APPS[
-        INSTALLED_APPS.index("oscar_stripe_sca.apps.StripeSCACheckoutConfig")
-    ] = "oscar_stripe_sca.testing.MockStripeSCACheckoutConfig"
-
-Control accept/cancel per-scenario in your behave environment.py:
 
     from django.conf import settings
-
-    def before_scenario(context, scenario):
-        if 'payment_cancel' in scenario.tags:
-            settings.STRIPE_TESTING_OUTCOME = 'cancel'
-        else:
-            settings.STRIPE_TESTING_OUTCOME = 'accept'
+    settings.STRIPE_TESTING_OUTCOME = 'cancel'
+    settings.STRIPE_TESTING_OUTCOME = 'accept'
 """
 
 from django.conf import settings as django_settings
@@ -27,7 +16,7 @@ from oscar_stripe_sca.views import StripeSCASuccessResponseView
 
 
 class MockStripePaymentDetailsView(CorePaymentDetailsView):
-    """Replaces the Stripe-hosted payment page during feature tests.
+    """Replaces the Stripe-hosted payment page during tests.
 
     Reads ``settings.STRIPE_TESTING_OUTCOME``:
 
